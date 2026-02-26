@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <title>GRAciarnia 2026</title>
+  <base target="_top">
+  <style>
+    body {
+        font-family: "Almarai", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+
+    .search-container {
+      text-align: center;
+      padding: 20px;
+      max-width: 800px;
+      margin: 20px auto 120px auto;
+      background-color: #f7f7f7;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .przycisk {
+      align-items: center;
+      background-image: linear-gradient(to bottom, #4CAF50, #3e8e41);
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 16px;
+      height: 40px;
+      padding: 0 20px;
+      margin-left: 10px;
+      transition: all 0.2s;
+      vertical-align: middle;
+    }
+
+    .przycisk:hover {
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .sponsorzy {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+/* Dla telefonów */
+@media (max-width: 768px) {
+  .header img, .sponsorzy img {
+    width: 90vw; /* Zwiększone z 80vw - zajmie prawie całą szerokość ekranu */
+  }
+}
+
+/* Dla komputerów */
+@media (min-width: 769px) {
+  .header img, .sponsorzy img {
+    width: 600px; /* Zwiększone z 300px - możesz wpisać dowolną liczbę pikseli */
+  }
+}  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="logo2026.png" alt="Logo">
+  </div>
+
+  <div class="search-container">
+    <p>Wprowadź nazwę gry, której szukasz:</p>
+    <input type="text" id="searchTerm" placeholder="np. Catan, Dobble...">
+    <button class="przycisk" id="searchButton">Szukaj</button>
+
+    <div id="results"></div>
+  </div>
+
+  <div class="sponsorzy">
+    <img src="logo-sponsorzy.png" alt="Sponsorzy">
+  </div>
+
+<script>
+    var inputField = document.getElementById("searchTerm");
+    var searchButton = document.getElementById("searchButton");
+    var scriptURL = "https://script.google.com/macros/s/AKfycby02m-lt5gV32VV5gXAQ0wWTBfIrG4IOWLaJ-ZbXRt0R6H33EUVTczotsicosam4cTj/exec";
+    
+    var timeout = null;
+
+    // 1. Obsługa przycisku Szukaj
+    searchButton.addEventListener("click", function() {
+      clearTimeout(timeout); 
+      search(inputField.value.trim());
+    });
+
+    // 2. Obsługa wyszukiwania na żywo (z opóźnieniem 600ms)
+    inputField.addEventListener("input", function() {
+      clearTimeout(timeout);
+      var searchTerm = inputField.value.trim();
+      
+      timeout = setTimeout(function() {
+          search(searchTerm);
+      }, 600); 
+    });
+
+    // 3. Główna funkcja pobierająca dane
+    function search(term) {
+      var resultsDiv = document.getElementById("results");
+      // Nie czyścimy resultsDiv od razu, żeby uniknąć migania ekranu
+      
+      fetch(scriptURL + "?search=" + encodeURIComponent(term))
+        .then(response => {
+          if (!response.ok) throw new Error('Błąd sieci');
+          return response.json();
+        })
+        .then(data => displayResults(data))
+        .catch(error => {
+          console.error("Błąd:", error);
+          resultsDiv.innerHTML = "<p style='color:red;'>Błąd połączenia z bazą danych.</p>";
+        });
+    }
+
+    // 4. Funkcja budująca tabelę z wynikami
+    function displayResults(results) {
+      var resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (results && results.length > 0) {
+        var tableHTML = "<table><thead><tr><th>Nazwa Gry</th><th>Status</th></tr></thead><tbody>";
+
+        for (var i = 0; i < results.length; i++) {
+          var status = results[i][1] || "Brak danych";
+          tableHTML += "<tr><td>" + results[i][0] + "</td><td>" + status + "</td></tr>";
+        }
+
+        tableHTML += "</tbody></table>";
+        resultsDiv.innerHTML = tableHTML;
+      } else {
+        resultsDiv.innerHTML = "<p style='margin-top:20px;'>Brak pasujących gier w bibliotece.</p>";
+      }
+    }
+
+    // 5. Ładowanie wszystkich gier na start
+    document.addEventListener("DOMContentLoaded", function() {
+      document.title = "GRAciarnia 2026";
+      search(""); 
+    });
+</script>
+</body>
+</html>
