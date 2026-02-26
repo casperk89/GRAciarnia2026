@@ -127,16 +127,11 @@
 
 <script>
     var inputField = document.getElementById("searchTerm");
-    //var searchButton = document.getElementById("searchButton");
     var scriptURL = "https://script.google.com/macros/s/AKfycby02m-lt5gV32VV5gXAQ0wWTBfIrG4IOWLaJ-ZbXRt0R6H33EUVTczotsicosam4cTj/exec";
     
     var timeout = null;
 
-    // 1. Obsługa przycisku Szukaj
-    //searchButton.addEventListener("click", function() {
-      //clearTimeout(timeout); 
-      //search(inputField.value.trim());
-  //  });
+    // 1. Obsługa przycisku Szukaj - USUNIĘTO (przycisk nie istnieje w HTML)
 
     // 2. Obsługa wyszukiwania na żywo (z opóźnieniem 600ms)
     inputField.addEventListener("input", function() {
@@ -151,7 +146,6 @@
     // 3. Główna funkcja pobierająca dane
     function search(term) {
       var resultsDiv = document.getElementById("results");
-      // Nie czyścimy resultsDiv od razu, żeby uniknąć migania ekranu
       
       fetch(scriptURL + "?search=" + encodeURIComponent(term))
         .then(response => {
@@ -191,7 +185,9 @@
       search(""); 
     });
 </script>
+
 </body>
 </html>
+
 
 
