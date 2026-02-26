@@ -114,20 +114,14 @@
     
     var timeout = null;
 
-    // 1. Obsługa przycisku Szukaj
-    searchButton.addEventListener("click", function() {
-      clearTimeout(timeout); 
-      search(inputField.value.trim());
-    });
-
-    // 2. Obsługa wyszukiwania na żywo (z opóźnieniem 600ms)
+    // 2. Obsługa wyszukiwania na żywo (z opóźnieniem 900ms)
     inputField.addEventListener("input", function() {
       clearTimeout(timeout);
       var searchTerm = inputField.value.trim();
       
       timeout = setTimeout(function() {
           search(searchTerm);
-      }, 600); 
+      }, 900); 
     });
 
     // 3. Główna funkcja pobierająca dane
@@ -176,4 +170,5 @@
 </body>
 
 </html>
+
 
